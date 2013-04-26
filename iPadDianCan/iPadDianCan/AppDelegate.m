@@ -7,14 +7,47 @@
 //
 
 #import "AppDelegate.h"
-
+#import "MainViewController.h"
+#import "AFRestAPIClient.h"
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
     // Override point for customization after application launch.
-    self.window.backgroundColor = [UIColor whiteColor];
+    NSUserDefaults *ud=[NSUserDefaults standardUserDefaults];
+    NSString *udid=[ud objectForKey:@"udid"];
+    if (udid==nil) {
+        CFUUIDRef puuid = CFUUIDCreate( nil );
+        CFStringRef uuidString = CFUUIDCreateString( nil, puuid );
+        NSString * result = [NSString stringWithFormat:@"%@", uuidString ];
+        CFRelease(puuid);
+        CFRelease(uuidString);
+        NSDictionary *params = [NSDictionary dictionaryWithObjectsAndKeys:
+                                result, @"udid",
+                                @"2", @"ptype",
+                                nil];
+        [[AFRestAPIClient sharedClient] postPath:@"device" parameters:params success:^(AFHTTPRequestOperation *operation, id responseObject) {
+            NSDictionary *dn=(NSDictionary *)responseObject;
+            NSString *string=[dn objectForKey:@"deviceid"];
+            [ud setValue:string forKey:@"udid"];
+            [ud synchronize];
+            [[AFRestAPIClient sharedClient] setDefaultHeader:@"X-device" value:string];
+            
+        } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            NSLog(@"错误: %@", error);
+        }];
+    }
+    else{
+        [[AFRestAPIClient sharedClient] setDefaultHeader:@"X-device" value:udid];
+    }
+
+    MainViewController *mainCon=[[MainViewController alloc] init];
+    UINavigationController *navCon=[[UINavigationController alloc] initWithRootViewController:mainCon];
+    [navCon.navigationBar setBackgroundImage:[UIImage imageNamed:@"CustomizedNavBarBg"] forBarMetrics:UIBarMetricsDefault];
+    self.window.rootViewController=navCon;
+    [mainCon release];
+    [navCon release];
     [self.window makeKeyAndVisible];
     return YES;
 }

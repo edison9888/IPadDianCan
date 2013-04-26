@@ -12,3 +12,10 @@
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
 #endif
+#define SERVERADDRESS @"http://taochike.sinaapp.com/rest/1/taochike/" //服务器地址
+#define IMAGESERVERADDRESS @"http://taochike-menuimages.stor.sinaapp.com/medium/" //图片服务器地址
+#define LARGEIMAGESERVERADDRESS @"http://taochike-menuimages.stor.sinaapp.com/big/" //图片服务器地址
+
+//#define SERVERADDRESS @"http://192.168.1.200:8080/ChihuoPlatform/rest" //服务器地址
+//#define IMAGESERVERADDRESS @"http://192.168.1.200:8080/MenuImages/big/" //图片服务器地址
+#define KBadgeNotification @"updateBadgeNotification" //点菜数目通知
